@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="./assets/img/boom.jpg">
+<title> Boom Balloons- Fun Boom</title>
+<meta name="description" content="Balloons Game: create art with a responsive canvas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css" />
+<style>
+  body { margin:0; background:#000000; color:#ffffff; font-family:'Inter',sans-serif; }
+  h1 { text-align:center; margin-top:20px; }
+  p { text-align:center; }
+  .toolbar {
+    text-align:center;
+    margin:20px auto;
+  }
+  .toolbar button, .toolbar input[type=color] {
+    margin:0 5px;
+    padding:8px 12px;
+    font-weight:600;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+  }
+  canvas {
+    display:block;
+    background:#1b1f29;
+    margin:20px auto;
+    border:4px solid #222832;
+    cursor:pointer;
+    touch-action:none;
+  }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="logo" href="index.html" aria-label="Home"><img src="assets/img/boom.jpg" alt=" Boom Balloonsicon"><span> Balloons Game</span></a>
+    <div class="menu" data-nav-menu>
+      <a href="index.html" style='opacity:1;font-weight:800'>Home</a>
+      <a href="game.html" >Play Game</a>
+      <a href="leaderboard.html" >Leaderboard</a>
+      <a href="about.html" >About</a>
+      <a href="blog.html" >Blog</a>
+      <a href="faq.html" >FAQ</a>
+      <a href="privacy.html" >Privacy</a>
+      <a href="terms.html" >Terms</a>
+    </div>
+    <div class="right"><a class="btn ghost" data-nav-toggle>Menu</a><a class="btn" href="game.html">Play</a></div>
+  </div>
+</nav>
+
+<h1> Boom Balloons— Fun Sketch Pad</h1>
+<p>Click the bubbles to pop them before they fade! Try to get the highest score.</p>
+
+<div class="toolbar">
+  <input type="color" id="colorPicker" value="#37ffcd">
+  <button id="clearBtn">Restart</button>
+  <button id="saveBtn">Save Score</button>
+</div>
+
+<canvas id="drawCanvas" width="600" height="400"></canvas>
+
+<script>
+(function(){
+  const canvas = document.getElementById('drawCanvas');
+  const ctx = canvas.getContext('2d');
+  const clearBtn = document.getElementById('clearBtn');
+  const saveBtn = document.getElementById('saveBtn');
+
+  let bubbles = [];
+  let score = 0;
+  let animationId;
+
+  function createBubble(){
+    const radius = Math.random()*20+10;
+    bubbles.push({
+      x: Math.random()*(canvas.width - radius*2) + radius,
+      y: canvas.height + radius,
+      r: radius,
+      speed: Math.random()*1.5 + 0.5,
+      color: `hsl(${Math.random()*360},70%,60%)`
+    });
+  }
+
+  function drawBubbles(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    bubbles.forEach((b,i)=>{
+      b.y -= b.speed;
+      ctx.beginPath();
+      ctx.fillStyle = b.color;
+      ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+      ctx.fill();
+      if(b.y + b.r < 0) bubbles.splice(i,1);
+    });
+    ctx.fillStyle = '#fff';
+    ctx.font = '20px Inter';
+    ctx.fillText('Score: ' + score, 10, 25);
+    animationId = requestAnimationFrame(drawBubbles);
+  }
+
+  canvas.addEventListener('click', (e)=>{
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    bubbles.forEach((b,i)=>{
+      const dist = Math.hypot(mx - b.x, my - b.y);
+      if(dist < b.r){
+        bubbles.splice(i,1);
+        score++;
+      }
+    });
+  });
+
+  clearBtn.addEventListener('click', ()=>{
+    score = 0;
+    bubbles = [];
+  });
+
+  saveBtn.addEventListener('click', ()=>{
+    alert('Your score is: ' + score);
+  });
+
+  setInterval(createBubble, 800);
+  drawBubbles();
+})();
+</script>
+</body>
+</html>
